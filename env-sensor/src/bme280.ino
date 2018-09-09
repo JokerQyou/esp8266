@@ -118,9 +118,6 @@ JsonObject& callAPI(String api, JsonObject& data, TJsonBuffer& jsonBuffer, bool 
         if (httpCode == HTTP_CODE_OK || httpCode == HTTP_CODE_CREATED) {
             // Parse response into JSON
             // Use https://arduinojson.org/v5/assistant/ to calculate maximum size of your JSON object
-            const size_t bufferSize = JSON_OBJECT_SIZE(8) + 300;  // TODO
-            DynamicJsonBuffer jsonBuffer(bufferSize);
-            jsonBuffer.clear();
             JsonObject& json_data = jsonBuffer.parseObject(http.getString());
             if (!json_data.success()) {
                 Serial.println("Error parsing JSON");
