@@ -206,7 +206,7 @@ void refreshScreen(JsonObject& data) {
     display.println(F("%"));
 
     // Pressure
-    display.print(String(data["pressure"].as<float>() / 100.0F, 2));
+    display.print(String(data["pressure"].as<float>(), 2));
     display.println(F("hPa"));
 
     // Show
