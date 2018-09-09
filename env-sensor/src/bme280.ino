@@ -26,6 +26,9 @@
 #ifndef VERSION
     #define VERSION "0.2.2"
 #endif
+#ifndef DEVICE_ID
+    #error "Please define DEVICE_ID in user_config.h"
+#endif
 // Data publish interval, in MS.
 #ifndef PUBLISH_INTERVAL
     #define PUBLISH_INTERVAL 600000  // 600 seconds
@@ -176,7 +179,7 @@ const char* login() {
 
 JsonObject& readBME280(StaticJsonBuffer<200>& buffer) {
     JsonObject& data = buffer.createObject();
-    data["sensor"] = "debugger";
+    data["sensor"] = DEVICE_ID;
     // 2 digits precision will be fine
     data["temperature"] = round(bme.readTemperature() * 100) / 100.0;
     data["humidity"] = round(bme.readHumidity() * 100) / 100.0;
