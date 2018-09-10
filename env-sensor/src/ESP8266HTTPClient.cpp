@@ -512,7 +512,6 @@ int HTTPClient::sendRequest(const char * type, uint8_t * payload, size_t size)
 
     // send Payload if needed
     if(payload && size > 0) {
-        Serial.printf("Sending payload:\n---\n%s\n---\n", payload);
         if(_tcp->write(payload, size) != size) {
             return returnError(HTTPC_ERROR_SEND_PAYLOAD_FAILED);
         }
@@ -1019,7 +1018,6 @@ bool HTTPClient::sendHeader(const char * type)
 
     header += _headers + "\r\n";
 
-    Serial.printf("[HTTP-Client] sending request header\n-----\n%s-----\n", header.c_str());  // DEBUG
     DEBUG_HTTPCLIENT("[HTTP-Client] sending request header\n-----\n%s-----\n", header.c_str());
 
     return (_tcp->write((const uint8_t *) header.c_str(), header.length()) == header.length());
