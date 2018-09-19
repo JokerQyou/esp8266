@@ -38,14 +38,10 @@
 // Notice: these are GPIO pin numbers
 #define OLED_DC     2
 #define OLED_CS     15
-#define OLED_RESET  16
+#define OLED_RESET  0
 Adafruit_SSD1306 display(OLED_DC, OLED_RESET, OLED_CS);
 
 Adafruit_BME280 bme; // sensor in I2C mode
-
-long last_publish = 0;
-long last_refresh_screen = 0;
-
 HTTPClient http;
 char SESSION_TOKEN[26] = "";
 
@@ -219,30 +215,18 @@ void refreshScreen(JsonObject& data) {
 }
 
 void loop() {
-    long now = millis();
+    // Read sensor data
+    StaticJsonBuffer<200> buffer;
+    JsonObject& sensor_data = readBME280(buffer);
+    refreshScreen(sensor_data);
+    sensor_data.printTo(Serial);
 
-    // If current uptime is smaller than last publish time, then we're hitting
-    // the max uptime value for unsigned int type, reset some values accordingly
-    if (now - last_refresh_screen < 0) {
-        last_refresh_screen = 0;
-        last_publish = 0;
-    }
+    // Send data to server
+    DynamicJsonBuffer recvBuffer(JSON_OBJECT_SIZE(2));
+    callAPI(API_PUBLISH, sensor_data, recvBuffer, true);
 
-    if (now - last_refresh_screen > 5000) {
-        last_refresh_screen = now;
-
-        // Read sensor data
-        StaticJsonBuffer<200> buffer;
-        JsonObject& sensor_data = readBME280(buffer);
-        refreshScreen(sensor_data);
-
-        if (now - last_publish > PUBLISH_INTERVAL) {
-            last_publish = now;
-            sensor_data.printTo(Serial);
-            DynamicJsonBuffer recvBuffer(JSON_OBJECT_SIZE(2));
-            callAPI(API_PUBLISH, sensor_data, recvBuffer, true);
-        }
-    }
+    // deepsleep 10 minutes
+    ESP.deepSleep(600e6);
 }
 
 void setup() {
